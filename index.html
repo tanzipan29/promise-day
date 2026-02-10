@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Potential Promises</title>
+    <style>
+        :root {
+            --maroon: #800000;
+            --gold: #D4AF37;
+            --cream: #FFFDD0;
+            --paper: #ffffff;
+        }
+
+        body {
+            background-color: #fdf5e6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Georgia', serif;
+            overflow: hidden;
+        }
+
+        /* --- Envelope Styles --- */
+        .envelope-wrapper {
+            position: relative;
+            width: 320px;
+            height: 220px;
+            transition: transform 0.5s;
+        }
+
+        .envelope {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: var(--maroon);
+            border-radius: 0 0 10px 10px;
+            z-index: 1;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            cursor: pointer;
+        }
+
+        .flap {
+            position: absolute;
+            top: 0;
+            width: 0;
+            height: 0;
+            border-left: 160px solid transparent;
+            border-right: 160px solid transparent;
+            border-top: 110px solid var(--maroon);
+            transform-origin: top;
+            transition: transform 0.6s ease;
+            z-index: 4;
+        }
+
+        .envelope-wrapper.open .flap {
+            transform: rotateX(180deg);
+            z-index: 0;
+        }
+
+        /* --- Paper Stack Styles --- */
+        .letter-stack {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 300px;
+            height: 200px;
+            z-index: 2;
+        }
+
+        .paper {
+            position: absolute;
+            width: 280px;
+            height: 380px;
+            background: var(--paper);
+            padding: 30px 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border: 1px solid #eee;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: center;
+            box-sizing: border-box;
+            transition: transform 0.8s ease;
+            transform: translateY(0);
+            cursor: pointer;
+            border-top: 5px solid var(--gold);
+        }
+
+        .envelope-wrapper.open .paper {
+            transform: translateY(-200px);
+        }
+
+        /* Crumple & Throw Animation */
+        @keyframes crumpleThrow {
+            0% { transform: translateY(-200px) scale(1) rotate(0deg); }
+            30% { transform: translateY(-220px) scale(0.8) rotate(15deg); border-radius: 40%; }
+            100% { transform: translate(600px, -800px) scale(0) rotate(720deg); opacity: 0; }
+        }
+
+        .crumpled {
+            animation: crumpleThrow 0.9s forwards ease-in;
+            pointer-events: none;
+        }
+
+        .paper h2 { color: var(--maroon); font-size: 1.2rem; margin-bottom: 20px; }
+        .paper p { font-size: 1.1rem; line-height: 1.5; color: #333; }
+        .paper small { margin-top: 40px; color: #999; text-transform: uppercase; letter-spacing: 1px; font-size: 0.7rem; }
+
+        /* Specific stacking order */
+        #p1 { z-index: 10; }
+        #p2 { z-index: 9; transform: rotate(-2deg); }
+        #p3 { z-index: 8; transform: rotate(2deg); }
+
+        /* --- Big Reveal Section --- */
+        .reveal-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #fdf5e6;
+            z-index: 100;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .wedding-border {
+            font-size: 2.5rem;
+            margin: 20px;
+            filter: drop-shadow(0 0 5px var(--gold));
+        }
+
+        .caption {
+            color: var(--maroon);
+            font-size: 2rem;
+            width: 80%;
+            min-height: 100px;
+            font-weight: bold;
+            line-height: 1.4;
+            padding: 0 20px;
+        }
+
+        .wedding-animation {
+            font-size: 5rem;
+            margin: 20px 0;
+            animation: celebration 1s infinite alternate;
+        }
+
+        @keyframes celebration {
+            from { transform: scale(1); }
+            to { transform: scale(1.15); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="envelope-wrapper" id="wrapper">
+        <div class="envelope" onclick="openEnvelope()">
+            <div class="flap"></div>
+            
+            <div class="letter-stack">
+                <div class="paper" id="p1" onclick="nextPage(1, event)">
+                    <h2>Potential Promises this Promise Day</h2>
+                    <p>1. I could promise you that I'd never give you wrong directions in the car...</p>
+                    <small>Tap to discard</small>
+                </div>
+                <div class="paper" id="p2" onclick="nextPage(2, event)">
+                    <p>2. Or that I'd buy less clothes every month...</p>
+                    <small>Tap to discard</small>
+                </div>
+                <div class="paper" id="p3" onclick="nextPage(3, event)">
+                    <p>3. Or that I'd stop going overboard with gifting...</p>
+                    <small>Tap to discard</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="reveal" class="reveal-container">
+        <div class="wedding-border">🌸 ✨ 🎺 ✨ 🌸</div>
+        <div class="wedding-animation">💍👩‍❤️‍👨🔥</div>
+        <h1 class="caption" id="captionText"></h1>
+        <div class="wedding-border">🌸 ✨ 🎺 ✨ 🌸</div>
+    </div>
+
+    <audio id="customAudio" src="promise-day-audio.mp4"></audio>
+
+    <script>
+        const caption = "But Hemabh, shaadi kar rahi hoon tujhse, isse bada kya promise karun??";
+        let charIndex = 0;
+        let isOpened = false;
+
+        function openEnvelope() {
+            if (!isOpened) {
+                document.getElementById('wrapper').classList.add('open');
+                isOpened = true;
+            }
+        }
+
+        function nextPage(pageNumber, event) {
+            // Stop the click from triggering the envelope open function again
+            event.stopPropagation();
+            
+            const page = document.getElementById(`p${pageNumber}`);
+            page.classList.add('crumpled');
+            
+            // Trigger reveal after the last page is thrown
+            if (pageNumber === 3) {
+                setTimeout(revealEverything, 800);
+            }
+        }
+
+        function revealEverything() {
+            const reveal = document.getElementById('reveal');
+            reveal.style.display = 'flex';
+            
+            const audio = document.getElementById('customAudio');
+            // Play audio - this works because the user just clicked a page
+            audio.play().catch(e => console.log("Audio play blocked:", e));
+            
+            typeWriter();
+        }
+
+        function typeWriter() {
+            if (charIndex < caption.length) {
+                document.getElementById("captionText").innerHTML += caption.charAt(charIndex);
+                charIndex++;
+                setTimeout(typeWriter, 80); // Adjust speed here
+            }
+        }
+    </script>
+</body>
+</html>
